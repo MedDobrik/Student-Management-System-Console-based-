@@ -4,7 +4,6 @@
 #include <stdbool.h>
 
 // Student Management System (Console-based)
-
 typedef struct Student{
     char name[50];
     char ID[20];
@@ -13,14 +12,20 @@ typedef struct Student{
 }Student;
 
 void PrintAllStudents(Student Students[],int TOTAL_STUDENTS) {
-    int i;
+
+    printf("\n======- Students List -======\n\n");
     for(int i = 0; i < TOTAL_STUDENTS; i++){
-        printf("\n%s | %s | %d | %.2f\n", 
+        if(Students[i].name[0] != '\0'){
+            printf("\nName\t: %s\nID\t:%s\nAge\t:%d\nGrade\t:%.2f\n", 
                 Students[i].name,
                 Students[i].ID,
                 Students[i].age,
                 Students[i].grade);
+            printf("-----------------------");
+        }
     }
+    printf("\n=============================\n\n");
+
 }
 
 void AddStudent(Student Students[],int *TOTAL_STUDENTS) {
@@ -41,23 +46,93 @@ void AddStudent(Student Students[],int *TOTAL_STUDENTS) {
     printf("\nCurrent Total Students is : %d\n", *TOTAL_STUDENTS);
 }
 
-void UpdateStudent() {
-    
+void UpdateStudent(Student Students[], int *TOTAL_STUDENTS) {
+    // Find Student :
+    int i, found, OP;
+    char Find_name[50];
+    printf("\n\nEnter Students Name : ");
+    getchar();
+    gets(Find_name);
+
+    for(i = 0; i < *TOTAL_STUDENTS; i++){
+        if(strcmp(Find_name, Students[i].name) == 0){
+            found = i;
+            printf("\n\n======- Students Found -======\n");
+            printf("\nName\t: %s\nID\t:%s\nAge\t:%d\nGrade\t:%.2f\n", 
+                Students[i].name,
+                Students[i].ID,
+                Students[i].age,
+                Students[i].grade);
+            printf("-----------------------");
+            int run = 1;
+            do{
+                printf("\n\n1 - Change Name\n2 - Change ID\n3 - Change Age\n4 - Change grade\n5 - quit");
+                printf("\n Chose From 1 to 5 : ");
+                scanf("%d", &OP);
+                if(OP == 1){
+                    printf("\nEnter The New Name : ");
+                    getchar();
+                    gets(Students[found].name);
+                    printf("\nThe Name is changed Successfully");
+                }
+                else if (OP == 2)
+                {
+                    printf("\nEnter The New ID : ");
+                    getchar();
+                    gets(Students[found].ID);
+                    printf("\nThe ID is changed Successfully");
+
+                }
+                else if (OP == 3)
+                {
+                    printf("\nEnter The New Age : ");
+                    scanf("%d", &Students[found].age);
+                    printf("\nThe Age is changed Successfully");
+
+                }
+                else if (OP == 4)
+                {
+                    printf("\nEnter The New Grade : ");
+                    scanf("%f", &Students[found].grade);
+                    printf("\nThe Grade is changed Successfully");
+
+                }
+                else run = 0;
+            }while(run == 1);
+            
+            break;
+        }
+
+        if(i == *TOTAL_STUDENTS - 1 && found != i){
+            printf("\n=====- Students Not Found -=====\n");
+        }
+    }
 }
 
-void DeleteStudent() {
+void DeleteStudent(Student Students[], int TOTAL_STUDENTS) {
 
+    char name[50];
+
+    printf("\n\nEnter Students Name To Delete : ");
+    getchar();
+    gets(name);
+
+    for(int i = 0; i < TOTAL_STUDENTS; i++){
+        if (strcmp(Students[i].name,name) == 0){
+            Students[i].name[0] = '\0';
+            printf("Students Deleted Successfully");
+        }
+    }
 }
-
 
 int main(){
+
     int i;
     int TOTAL_STUDENTS = 0;
     // Load Students From The Students File
 
     Student Students[100];
     
-
     FILE *file1;
     FILE *file2;
     file1 = fopen("file.csv", "r");
@@ -73,7 +148,6 @@ int main(){
               Students[TOTAL_STUDENTS].ID,
               &Students[TOTAL_STUDENTS].age, 
               &Students[TOTAL_STUDENTS].grade);
-        printf("\n\n%d\n\n", read);
         if (read = 4) TOTAL_STUDENTS++;
     }while(!feof(file1));
 
@@ -105,11 +179,11 @@ int main(){
                 }
                 else if (OP2 == 3)
                 {
-                    /* update Student Information */
+                    UpdateStudent(Students, &TOTAL_STUDENTS);
                 }
                 else if (OP2 == 4)
                 {
-                    /* Delete Student */
+                    DeleteStudent(Students, TOTAL_STUDENTS);
                 }
                 else run2 = false;
                 
@@ -125,11 +199,15 @@ int main(){
     }
     
     for(i = 0; i < TOTAL_STUDENTS; i++){
-        fprintf(file2, "%s,%s,%d,%f\n",
+
+        if(Students[i].name[0] != '\0'){
+            fprintf(file2, "%s,%s,%d,%f\n",
                 Students[i].name,
                 Students[i].ID,
                 Students[i].age,
                 Students[i].grade);
+        }
+        
         if (ferror(file2)){
             printf("Error Writing To The File");
             return 1;
